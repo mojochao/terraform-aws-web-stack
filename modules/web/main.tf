@@ -3,7 +3,6 @@ data "aws_availability_zones" "all" {}
 locals {
   cluster_name            = "${var.tags["System"]}-${var.environment}"
   http_port               = 80
-  https_port              = 443
   ssh_port                = 22
   tags = {
     Description           = "${var.description}"
@@ -37,13 +36,10 @@ resource "aws_autoscaling_group" "backend" {
   name                    = "${local.cluster_name}-asg"
   launch_configuration    = "${aws_launch_configuration.backend.id}"
   availability_zones      = ["${data.aws_availability_zones.all.names}"]
-  load_balancers          = ["${aws_alb.frontend.name}"]
+  target_group_arns       = ["${aws_alb_target_group.frontend.name}"]
   health_check_type       = "ELB"
   min_size                = "${var.min_size}"
   max_size                = "${var.max_size}"
-  // This resource type uses different tags specification format.
-  // A list comp over the locals tags map would sure come in handy to keep
-  // things DRY.
   tags                    = [
     {
       key                 = "System"
@@ -111,12 +107,11 @@ resource "aws_alb" "frontend" {
 
 resource "aws_alb_listener" "frontend" {
   load_balancer_arn       = "${aws_alb.frontend.arn}"
-  port                    = "${local.https_port}"
-  protocol                = "HTTPS"
-  ssl_policy              = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  port                    = "${local.http_port}"
+  protocol                = "HTTP"
 
   default_action {
-    target_group_arn      = "${aws_alb.frontend.arn}"
+    target_group_arn      = "${aws_alb_target_group.frontend.arn}"
     type                  = "forward"
   }
 }
@@ -132,7 +127,7 @@ resource "aws_alb_listener_rule" "frontend" {
 
   condition {
     field = "host-header"
-    values = ["*"]
+    values = ["*.*"]
   }
 }
 
@@ -152,11 +147,6 @@ resource "aws_alb_target_group" "frontend" {
     protocol              = "HTTP"
     path                  = "/"
   }
-}
-
-resource "aws_autoscaling_attachment" "frontend" {
-  alb_target_group_arn    = "${aws_alb_target_group.frontend.arn}"
-  autoscaling_group_name = "${aws_autoscaling_group.backend.id}"
 }
 
 resource "aws_security_group" "frontend" {
