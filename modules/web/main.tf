@@ -7,7 +7,7 @@ locals {
   tags = {
     Description           = "${var.description}"
     Environment           = "${var.environment}"
-    Owner                 = "${var.owner}"
+    Maintainer            = "${var.maintainer}"
   }
 }
 
@@ -15,17 +15,21 @@ locals {
 # Back-end Auto-scaling Group (ASG) Resources
 #------------------------------------------------------------------------------
 
+data "template_file" "user_data" {
+  template                = "user_data.tpl"
+
+  vars {
+    nginx                 = "nginx"
+  }
+}
+
 resource "aws_launch_configuration" "backend" {
-  name                    = "${local.cluster_name}-launch-configuration"
+  name_prefix             = "${local.cluster_name}-lc"
   image_id                = "${var.source_ami}"
   instance_type           = "${var.instance_type}"
   security_groups         = ["${aws_security_group.backend.id}"]
-
-  user_data = <<-EOF
-            #!/bin/bash
-            echo "Hello, World" > index.html
-            nohup busybox httpd -f -p "${local.http_port}" &
-            EOF
+  key_name                = "samba@cloudserver"
+  user_data               = "${data.template_file.user_data.rendered}"
 
   lifecycle {
     create_before_destroy = true
@@ -46,13 +50,18 @@ resource "aws_autoscaling_group" "backend" {
       propagate_at_launch = true
     },
     {
+      key                 = "Product"
+      value               = "${var.tags["Product"]}"
+      propagate_at_launch = true
+    },
+    {
       key                 = "Environment"
       value               = "${local.tags["Environment"]}"
       propagate_at_launch = true
     },
     {
-      key                 = "Owner"
-      value               = "${local.tags["Owner"]}"
+      key                 = "Maintainer"
+      value               = "${local.tags["Maintainer"]}"
       propagate_at_launch = true
     },
     {
@@ -87,6 +96,15 @@ resource "aws_security_group_rule" "backend_allow_ssh_inbound" {
   from_port               = "${local.ssh_port}"
   to_port                 = "${local.ssh_port}"
   protocol                = "tcp"
+  cidr_blocks             = ["0.0.0.0/0"]
+}
+
+resource "aws_security_group_rule" "backend_allow_all_outbound" {
+  type                    = "egress"
+  security_group_id       = "${aws_security_group.backend.id}"
+  from_port               = 0
+  to_port                 = 0
+  protocol                = "-1"
   cidr_blocks             = ["0.0.0.0/0"]
 }
 

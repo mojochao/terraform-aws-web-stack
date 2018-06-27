@@ -11,7 +11,8 @@ terraform {
 locals {
   tags = {
     System         = "demo-svc"
-    Owner          = "Allen Gooch"
+    Product        = "Demo service"
+    Maintainer     = "Allen Gooch"
   }
 }
 

@@ -11,7 +11,7 @@ module "web" {
   source           = "../../../modules/web"
   environment      = "prod"
   region           = "us-west-2"
-  owner            = "Allen Gooch"
+  maintainer       = "Allen Gooch"
   description      = "terraform-aws-web-stack demo service"
   source_ami       = "ami-e6d5969e"
   instance_type    = "c5.xlarge"
