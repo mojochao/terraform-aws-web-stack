@@ -1,2 +1,2 @@
 #!/bin/bash
-apt-get install ${nginx} --yes
+apt-get install ${packages} --yes

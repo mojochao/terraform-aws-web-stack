@@ -15,13 +15,13 @@ locals {
 # Back-end Auto-scaling Group (ASG) Resources
 #------------------------------------------------------------------------------
 
-data "template_file" "user_data" {
-  template                = "user_data.tpl"
-
-  vars {
-    nginx                 = "nginx"
-  }
-}
+//data "template_file" "user_data" {
+//  template                = "./user_data.tpl"
+//
+//  vars {
+//    packages              = "nginx"
+//  }
+//}
 
 resource "aws_launch_configuration" "backend" {
   name_prefix             = "${local.cluster_name}-lc"
@@ -29,7 +29,11 @@ resource "aws_launch_configuration" "backend" {
   instance_type           = "${var.instance_type}"
   security_groups         = ["${aws_security_group.backend.id}"]
   key_name                = "samba@cloudserver"
-  user_data               = "${data.template_file.user_data.rendered}"
+//  user_data               = "${data.template_file.user_data.rendered}"
+  user_data = <<-EOF
+            #!/bin/bash
+            apt-get install nginx
+            EOF
 
   lifecycle {
     create_before_destroy = true
