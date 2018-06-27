@@ -39,7 +39,7 @@ resource "aws_autoscaling_group" "backend" {
   target_group_arns       = ["${aws_alb_target_group.frontend.arn}"]
   min_size                = "${var.min_size}"
   max_size                = "${var.max_size}"
-  tags                    = [
+  tags = [
     {
       key                 = "System"
       value               = "${var.tags["System"]}"
@@ -116,17 +116,17 @@ resource "aws_alb_listener" "frontend" {
 }
 
 resource "aws_alb_listener_rule" "frontend" {
-  depends_on = ["aws_alb_target_group.frontend"]
-  listener_arn = "${aws_alb_listener.frontend.arn}"
+  depends_on              = ["aws_alb_target_group.frontend"]
+  listener_arn            = "${aws_alb_listener.frontend.arn}"
 
   action {
-    target_group_arn = "${aws_alb_target_group.frontend.arn}"
-    type = "forward"
+    target_group_arn      = "${aws_alb_target_group.frontend.arn}"
+    type                  = "forward"
   }
 
   condition {
-    field = "host-header"
-    values = ["*.*"]
+    field                 = "host-header"
+    values                = ["*.*"]
   }
 }
 
