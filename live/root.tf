@@ -8,19 +8,22 @@ terraform {
   }
 }
 
+provider "aws" {
+  version          = "~> 1.25"
+  alias            = "usw2"
+  region           = "us-west-2"
+}
+
+provider "template" {
+  version          = "~> 1.0"
+}
+
 locals {
   tags = {
     System         = "demo-svc"
     Product        = "Demo service"
     Maintainer     = "Allen Gooch"
   }
-}
-
-
-provider "aws" {
-  version          = "~> 1.24"
-  alias            = "usw2"
-  region           = "us-west-2"
 }
 
 module "prod" {
