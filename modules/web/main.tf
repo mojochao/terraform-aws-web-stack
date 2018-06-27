@@ -36,8 +36,7 @@ resource "aws_autoscaling_group" "backend" {
   name                    = "${local.cluster_name}-asg"
   launch_configuration    = "${aws_launch_configuration.backend.id}"
   availability_zones      = ["${data.aws_availability_zones.all.names}"]
-  target_group_arns       = ["${aws_alb_target_group.frontend.name}"]
-  health_check_type       = "ELB"
+  target_group_arns       = ["${aws_alb_target_group.frontend.arn}"]
   min_size                = "${var.min_size}"
   max_size                = "${var.max_size}"
   tags                    = [
