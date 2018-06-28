@@ -14,21 +14,21 @@ It builds the following AWS resources:
 
 It requires the following inputs:
 
-- ami
-- cluster_name
-- db_size_gb
-- db_instance_type
-- desired_size
+- description
 - domain_name
-- instance_type
+- environment
 - key_name
-- min_size
-- max_size
+- maintainer
 - region
-- ssl_policy
 - subnets
-- tags
 - vpc
+- db_instance_type
+- db_size_gb
+- web_instance_ami
+- web_instance_type
+- web_instances_desired
+- web_instances_max
+- web_instances_min
 
 It provides the following outputs:
 
