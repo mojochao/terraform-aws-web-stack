@@ -1,5 +1,6 @@
 locals {
   cluster_name  = "${var.tags["System"]}-${var.environment}"
+  ssl_policy       = "ELBSecurityPolicy-TLS-1-2-2017-01"
   tags = {
     Description = "${var.description}"
     Environment = "${var.environment}"
@@ -23,16 +24,16 @@ module "db" {
 module "web" {
   source        = "./web"
 
-  ami           = "${var.ami}"
+  ami           = "${var.web_instance_ami}"
   cluster_name  = "${local.cluster_name}"
-  desired_size  = "${var.desired_size}"
+  desired_size  = "${var.web_instances_desired}"
   domain_name   = "${var.domain_name}"
-  instance_type = "${var.instance_type}"
+  instance_type = "${var.web_instance_type}"
   key_name      = "${var.key_name}"
-  max_size      = "${var.max_size}"
-  min_size      = "${var.min_size}"
+  max_size      = "${var.web_instances_max}"
+  min_size      = "${var.web_instances_min}"
   region        = "${var.region} "
-  ssl_policy    = "${var.ssl_policy}"
+  ssl_policy    = "${local.ssl_policy}"
   subnets       = "${var.subnets}"
   tags          = "${merge(var.tags, local.tags)}"
   vpc           = "${var.vpc}"
