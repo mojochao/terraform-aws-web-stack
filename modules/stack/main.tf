@@ -3,8 +3,8 @@ locals {
   key_name      = "samba@cloudserver"
   ssl_policy    = "ELBSecurityPolicy-TLS-1-2-2017-01"
   tags = {
-    System      = "demo-svc"
-    Product     = "Demo service"
+    System      = "recs-api"
+    Product     = "Recommendations API"
     Description = "${var.description}"
     Environment = "${var.environment}"
     Maintainer  = "${var.maintainer}"

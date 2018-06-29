@@ -2,9 +2,30 @@ terraform {
   required_version      = ">= 0.11, < 0.12"
 
   backend "s3" {
-    bucket              = "agooch-demo-svc-tfstate"
+  bucket                = "${local.tfstate_bucket}"
     key                 = "terraform.tfstate"
     region              = "us-west-2"
+  }
+}
+
+locals {
+  tags = {
+    System              = "recs-api"
+    Product             = "Recommendations API"
+  }
+  tfstate_bucket        = "recommendations-api-tfstate"
+}
+
+resource "aws_s3_bucket" "terraform_state" {
+  bucket                = "${local.tfstate_bucket}"
+  tags                  = "${local.tags}"
+
+  versioning {
+    enabled             = true
+  }
+
+  lifecycle {
+    prevent_destroy     = false
   }
 }
 
